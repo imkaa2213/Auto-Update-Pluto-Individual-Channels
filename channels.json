@@ -34,5 +34,115 @@
     "name": "Big Brother Camera 4",
     "region": "us",
     "group": "Big Brother Live"
+  },
+  {
+    "id": "654930a8346f420008d3b0b8",
+    "name": "Oxygen True Crime Archives",
+    "region": "us"
+  },
+  {
+    "id": "68ee9a999938143525bfc385",
+    "name": "Shop LC",
+    "region": "us"
+  },
+  {
+    "id": "5bdcdf1e851dd5632e2c11d1",
+    "name": "QVC",
+    "region": "us"
+  },
+  {
+    "id": "5f8a02476b72230007e62b7d",
+    "name": "HSN",
+    "region": "us"
+  },
+  {
+    "id": "64dab5fe35425100080e2991",
+    "name": "Vevo Regional Mexicano",
+    "region": "us"
+  },
+  {
+    "id": "64c37e710e086a0009e824ab",
+    "name": "That's 70s",
+    "region": "gb"
+  },
+  {
+    "id": "6490254fd2c47c00083a5743",
+    "name": "That's 80s",
+    "region": "gb"
+  },
+  {
+    "id": "660c209e19ca71000846cf38",
+    "name": "That's 90s00s",
+    "region": "gb"
+  },
+  {
+    "id": "6568a78d635c3c0008765f41",
+    "name": "That's Rock",
+    "region": "gb"
+  },
+  {
+    "id": "69445a9a78c0c45b6c9aa8b9",
+    "name": "TikTok Radio",
+    "region": "us"
+  },
+  {
+    "id": "63dac1b78795f300086d5ca6",
+    "name": "TikTok Radio en Español",
+    "region": "mx"
+  },
+  {
+    "id": "63dac32bda711800088a2ba3",
+    "name": "TikTok Radio Brasil",
+    "region": "br"
+  },
+  {
+    "id": "65453f30085df200085883d8",
+    "name": "ION",
+    "region": "us"
+  },
+  {
+    "id": "65d92a8c8b24c80008e285c0",
+    "name": "BBC News",
+    "region": "us"
+  },
+  {
+    "id": "6792c30abc03978b9b8bb832",
+    "name": "The NBA Channel",
+    "region": "us"
+  },
+  {
+    "id": "65493029ab052400089e9d2f",
+    "name": "GolfPass",
+    "region": "us"
+  },
+  {
+    "id": "681109b688b9d85d0938c6ba",
+    "name": "TennisChannel 2",
+    "region": "us"
+  },
+  {
+    "id": "649b6898f2ec0000081a9460",
+    "name": "DAZN Ringside",
+    "region": "us"
+  },
+  {
+    "id": "5a74b8e1e22a61737979c6bf",
+    "name": "FOX Sports",
+    "region": "us"
+  },
+  {
+    "id": "6549306c83595c000815a696",
+    "name": "NBC Sports NOW",
+    "region": "us"
+  },
+  {
+    "id": "5e9f2c05172a0f0007db4786",
+    "name": "CBS Sports HQ",
+    "region": "us"
+  },
+  {
+    "id": "5ced7d5df64be98e07ed47b6",
+    "name": "NFL Channel",
+    "region": "us"
   }
 ]
