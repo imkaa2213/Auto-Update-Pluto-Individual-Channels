@@ -144,5 +144,10 @@
     "id": "5ced7d5df64be98e07ed47b6",
     "name": "NFL Channel",
     "region": "us"
+  },
+  {
+    "id": "5e66968a70f34c0007d050be",
+    "name": "MLB",
+    "region": "us"    
   }
 ]
