@@ -1,0 +1,32 @@
+[
+  {
+    "id": "646ccc7a2858cb0008127367",
+    "name": "Azteca UNO -1 hora",
+    "region": "mx",
+    "group": "Entretenimiento"
+  },
+  {
+    "id": "64a765c04ea480000823917a",
+    "name": "Big Brother Camera 1",
+    "region": "us",
+    "group": "Big Brother Live"
+  },
+  {
+    "id": "64a765fb798def0008734632",
+    "name": "Big Brother Camera 2",
+    "region": "us",
+    "group": "Big Brother Live"
+  },
+  {
+    "id": "64a7665b902f2300085d7901",
+    "name": "Big Brother Camera 3",
+    "region": "us",
+    "group": "Big Brother Live"
+  },
+  {
+    "id": "64a766a794635e0008626601",
+    "name": "Big Brother Camera 4",
+    "region": "us",
+    "group": "Big Brother Live"
+  }
+]
