@@ -2,7 +2,10 @@ name: Update Individual Pluto Channels
 
 on:
   schedule:
+    # Run automatically every 6 hours
     - cron: "0 */6 * * *"
+
+  # Also allows manual runs from the Actions tab
   workflow_dispatch:
 
 permissions:
@@ -13,30 +16,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Download the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Install Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
+      # Install required Python package
       - name: Install dependencies
-        run: pip install requests
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
 
-      - name: Update channels
-        run: python pluto_provider.py
+      # Run our Pluto channel generator
+      - name: Update Pluto channels
+        run: |
+          python pluto_provider.py
 
+      # Show generated M3U8 files in the log
+      - name: Show generated channels
+        run: |
+          echo "Generated M3U8 files:"
+          find . -maxdepth 1 -type f -name "*.m3u8" -print
+
+      # Commit any updated M3U8 files
       - name: Commit updated channels
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add -- '*.m3u'
+          git add -- '*.m3u8'
 
           if git diff --cached --quiet; then
             echo "No channel changes"
           else
-            git commit -m "Auto-update Pluto channels"
+            git commit -m "Auto-update Pluto M3U8 channels"
             git push
           fi
