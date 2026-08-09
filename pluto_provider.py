@@ -57,6 +57,10 @@ class PlutoProvider:
         return 30
 
     def get_session_token(self):
+        """
+        Creates or reuses a Pluto TV session.
+        """
+
         if (
             self.session_token
             and datetime.now().timestamp() < self.session_expires_at
@@ -87,6 +91,7 @@ class PlutoProvider:
                 params=params,
                 timeout=self.get_timeout(),
             )
+
             response.raise_for_status()
 
             data = response.json()
@@ -114,6 +119,10 @@ class PlutoProvider:
             return None
 
     def get_categories(self, headers):
+        """
+        Gets Pluto channel categories for the selected region.
+        """
+
         url = (
             "https://service-channels.clusters.pluto.tv/"
             "v2/guide/categories"
@@ -125,6 +134,7 @@ class PlutoProvider:
                 headers=headers,
                 timeout=self.get_timeout(),
             )
+
             response.raise_for_status()
 
             data = response.json().get("data", [])
@@ -141,7 +151,9 @@ class PlutoProvider:
                     "channelIDs",
                     [],
                 ):
-                    category_map[str(channel_id)] = category_name
+                    category_map[
+                        str(channel_id)
+                    ] = category_name
 
             return category_map
 
@@ -150,9 +162,14 @@ class PlutoProvider:
                 f"[{self.region}] WARNING: "
                 f"Could not load categories: {exc}"
             )
+
             return {}
 
     def get_channels(self) -> List[Dict[str, Any]]:
+        """
+        Gets all Pluto channels available in the selected region.
+        """
+
         token = self.get_session_token()
 
         if not token:
@@ -173,9 +190,11 @@ class PlutoProvider:
                 headers=headers,
                 timeout=self.get_timeout(),
             )
+
             response.raise_for_status()
 
             data = response.json().get("data", [])
+
             categories = self.get_categories(headers)
 
             channels = []
@@ -192,8 +211,12 @@ class PlutoProvider:
                 logo = next(
                     (
                         image.get("url")
-                        for image in channel.get("images", [])
-                        if image.get("type") == "colorLogoPNG"
+                        for image in channel.get(
+                            "images",
+                            [],
+                        )
+                        if image.get("type")
+                        == "colorLogoPNG"
                     ),
                     "",
                 )
@@ -236,7 +259,8 @@ class PlutoProvider:
                 )
 
             print(
-                f"[{self.region}] Found {len(channels)} Pluto channels."
+                f"[{self.region}] "
+                f"Found {len(channels)} Pluto channels."
             )
 
             return channels
@@ -245,12 +269,19 @@ class PlutoProvider:
             print(
                 f"[{self.region}] ERROR loading channels: {exc}"
             )
+
             return []
 
 
 def load_channel_config():
+    """
+    Loads channels.json from the repository root.
+    """
+
     if not os.path.exists(CHANNELS_FILE):
-        print(f"ERROR: {CHANNELS_FILE} was not found.")
+        print(
+            f"ERROR: {CHANNELS_FILE} was not found."
+        )
         sys.exit(1)
 
     try:
@@ -263,7 +294,8 @@ def load_channel_config():
 
     except json.JSONDecodeError as exc:
         print(
-            f"ERROR: Invalid JSON in {CHANNELS_FILE}: {exc}"
+            f"ERROR: Invalid JSON in "
+            f"{CHANNELS_FILE}: {exc}"
         )
         sys.exit(1)
 
@@ -275,7 +307,8 @@ def load_channel_config():
 
     if not isinstance(config, list):
         print(
-            "ERROR: channels.json must contain a JSON array."
+            "ERROR: channels.json must "
+            "contain a JSON array."
         )
         sys.exit(1)
 
@@ -283,16 +316,59 @@ def load_channel_config():
 
 
 def safe_filename(name):
+    """
+    Removes characters that cannot safely be
+    used in filenames while preserving spaces.
+    """
+
     name = re.sub(
         r'[<>:"/\\|?*]',
         "",
         name,
     )
 
-    return name.strip()
+    name = name.strip()
+
+    return name
 
 
-def make_playlist(channel, config, region):
+def make_m3u8_filename(item, configured_name):
+    """
+    Determines the output filename.
+
+    If channels.json contains "filename", it will
+    still normalize the extension to .m3u8.
+    """
+
+    filename = item.get("filename")
+
+    if not filename:
+        filename = safe_filename(
+            configured_name
+        )
+
+    filename = filename.strip()
+
+    # Remove an existing .m3u or .m3u8 extension.
+    if filename.lower().endswith(".m3u8"):
+        filename = filename[:-5]
+
+    elif filename.lower().endswith(".m3u"):
+        filename = filename[:-4]
+
+    return filename + ".m3u8"
+
+
+def make_playlist(
+    channel,
+    config,
+    region,
+):
+    """
+    Creates the contents of one individual
+    extended M3U8 playlist.
+    """
+
     channel_id = channel["id"]
 
     name = config.get(
@@ -313,8 +389,9 @@ def make_playlist(channel, config, region):
     epg = config.get(
         "epg",
         (
-            "https://github.com/matthuisman/"
-            "i.mjh.nz/raw/master/PlutoTV/"
+            "https://github.com/"
+            "matthuisman/i.mjh.nz/"
+            "raw/master/PlutoTV/"
             f"{region}.xml.gz"
         ),
     )
@@ -331,10 +408,18 @@ def make_playlist(channel, config, region):
 
 
 def update_channels():
+    """
+    Reads channels.json, groups channels by
+    region, retrieves each Pluto region only once,
+    and generates one .m3u8 per configured channel.
+    """
+
     config = load_channel_config()
 
     if not config:
-        print("channels.json contains no channels.")
+        print(
+            "channels.json contains no channels."
+        )
         return True
 
     regions = {}
@@ -350,9 +435,13 @@ def update_channels():
 
         if not channel_id:
             print(
-                "WARNING: Skipping entry without an ID."
+                "WARNING: Skipping entry "
+                "without an ID."
             )
             continue
+
+        if not region:
+            region = "us"
 
         if region not in regions:
             regions[region] = []
@@ -363,24 +452,40 @@ def update_channels():
     missing = 0
     errors = 0
 
-    for region, requested_channels in regions.items():
+    for (
+        region,
+        requested_channels,
+    ) in regions.items():
+
         print("")
         print(
-            f"===== Region: {region.upper()} ====="
+            f"===== Region: "
+            f"{region.upper()} ====="
         )
 
-        provider = PlutoProvider(region)
+        provider = PlutoProvider(
+            region
+        )
 
-        available_channels = provider.get_channels()
+        available_channels = (
+            provider.get_channels()
+        )
 
         if not available_channels:
             print(
                 f"[{region}] ERROR: "
-                "No channels returned. "
-                "Existing M3U files will remain untouched."
+                "No channels returned."
             )
 
-            errors += len(requested_channels)
+            print(
+                "Existing M3U8 files "
+                "will remain untouched."
+            )
+
+            errors += len(
+                requested_channels
+            )
+
             continue
 
         channel_index = {
@@ -389,14 +494,17 @@ def update_channels():
         }
 
         for item in requested_channels:
+
             channel_id = str(
                 item.get("id", "")
             ).strip()
 
-            configured_name = item.get(
-                "name",
-                channel_id,
-            )
+            configured_name = str(
+                item.get(
+                    "name",
+                    channel_id,
+                )
+            ).strip()
 
             channel = channel_index.get(
                 channel_id
@@ -404,25 +512,24 @@ def update_channels():
 
             if not channel:
                 print(
-                    f"NOT FOUND: {configured_name} "
-                    f"({channel_id}) [{region}]"
+                    f"NOT FOUND: "
+                    f"{configured_name} "
+                    f"({channel_id}) "
+                    f"[{region}]"
                 )
 
+                # Never overwrite or remove a
+                # previously working file simply
+                # because Pluto temporarily does
+                # not return the channel.
                 missing += 1
+
                 continue
 
-            filename = item.get("filename")
-
-            if not filename:
-                filename = (
-                    safe_filename(configured_name)
-                    + ".m3u"
-                )
-
-            if not filename.lower().endswith(
-                ".m3u"
-            ):
-                filename += ".m3u"
+            filename = make_m3u8_filename(
+                item,
+                configured_name,
+            )
 
             playlist = make_playlist(
                 channel,
@@ -436,7 +543,9 @@ def update_channels():
                     "w",
                     encoding="utf-8",
                 ) as file:
-                    file.write(playlist)
+                    file.write(
+                        playlist
+                    )
 
                 print(
                     f"UPDATED: {filename}"
@@ -446,21 +555,34 @@ def update_channels():
 
             except Exception as exc:
                 print(
-                    f"ERROR writing {filename}: {exc}"
+                    f"ERROR writing "
+                    f"{filename}: {exc}"
                 )
 
                 errors += 1
 
     print("")
-    print("===== Finished =====")
-    print(f"Updated: {updated}")
-    print(f"Not found: {missing}")
-    print(f"Errors: {errors}")
+    print(
+        "===== Finished ====="
+    )
+
+    print(
+        f"Updated: {updated}"
+    )
+
+    print(
+        f"Not found: {missing}"
+    )
+
+    print(
+        f"Errors: {errors}"
+    )
 
     return errors == 0
 
 
 if __name__ == "__main__":
+
     success = update_channels()
 
     if not success:
