@@ -149,5 +149,35 @@
     "id": "5e66968a70f34c0007d050be",
     "name": "MLB",
     "region": "us"    
-  }
+  },
+  {
+  "id": "6508be683a0d700008c534e4",
+  "name": "ABC News Live",
+  "region": "us"
+},
+{
+  "id": "63d025db4e83e700086eaa96",
+  "name": "LiveNOW from FOX",
+  "region": "us"
+},
+{
+  "id": "5df97894467dfa00091c873c",
+  "name": "NBC News NOW",
+  "region": "us"
+},
+{
+  "id": "62310f66d5888f0007534342",
+  "name": "CBS News",
+  "region": "us"
+},
+{
+  "id": "5ca1da6c593a5d78f0e7edce",
+  "name": "Euronews",
+  "region": "us"
+},
+{
+  "id": "55b285cd2665de274553d66f",
+  "name": "Sky News",
+  "region": "us"
+}
 ]
